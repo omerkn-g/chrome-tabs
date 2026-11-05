@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TabFlow — Work Session Manager (Google ADK Agent)</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Top Navigation & Action Header -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-logo" aria-hidden="true">
+        <span class="dot dot-blue"></span>
+        <span class="dot dot-rose"></span>
+        <span class="dot dot-emerald"></span>
+        <span class="dot dot-amber"></span>
+      </div>
+      <div>
+        <h1 class="brand-title">TabFlow <span class="badge-adk">ADK Multi-Agent</span></h1>
+        <p class="brand-subtitle">Turn saved Chrome Tab Groups into focused, deduplicated Work Sessions</p>
+      </div>
+    </div>
+
+    <div class="topbar-stats" id="statsBar">
+      <div class="stat-pill">
+        <span class="stat-label">Work Sessions</span>
+        <span class="stat-value" id="statGroups">0</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-label">Total Tabs</span>
+        <span class="stat-value" id="statTabs">0</span>
+      </div>
+      <div class="stat-pill stat-pill-highlight">
+        <span class="stat-label">PII &amp; Tokens Scrubbed</span>
+        <span class="stat-value" id="statRedactions">0</span>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="btn btn-success" id="btnSyncChrome" title="Import your real Chrome Tab Groups and Ungrouped Window Tabs">
+        🔄 Sync My Chrome Tabs
+      </button>
+      <button class="btn btn-secondary" id="btnImportClosedGroups" title="Import closed Saved Tab Groups from Chrome Sync Data LevelDB">
+        📂 Import Closed Groups
+      </button>
+      <input type="file" id="leveldbFileInput" webkitdirectory multiple style="display:none;" />
+      <button class="btn btn-primary" id="btnAutoAnalyze" title="Run Flash Triage + Pro Synthesizer to propose merges">
+        ✨ Auto-Analyze &amp; Propose Merges
+      </button>
+      <button class="btn btn-secondary" id="btnMergeSelected" style="display:none;">
+        🔗 Merge Selected (<span id="selectedCount">0</span>)
+      </button>
+      <button class="btn btn-ghost" id="btnResetDemo" title="Restore original messy tab groups">
+        ↺ Demo Groups
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Responsive Split Workspace -->
+  <main class="workspace">
+    <!-- Left Column: Visual Tab Groups / Work Sessions Board -->
+    <section class="board-column" aria-label="Work Sessions Board">
+      <div class="board-toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="Filter work sessions by name, 'where I left off' note, tab title, or domain..."
+            autocomplete="off"
+          />
+        </div>
+        <div class="toolbar-hint">
+          💡 Select any 2+ cards to propose a custom merge, or click <strong>Auto-Analyze</strong>.
+        </div>
+      </div>
+
+      <!-- Pending Human-in-the-Loop (HITL) Merge Proposals Banner -->
+      <div id="pendingPlansContainer" class="pending-plans-section" style="display:none;">
+        <div class="section-heading">
+          <span class="hitl-badge">HUMAN-IN-THE-LOOP CONFIRMATION REQUIRED</span>
+          <h2>Pending Work Session Merge Proposals</h2>
+        </div>
+        <div id="pendingPlansList" class="plans-grid"></div>
+      </div>
+
+      <!-- Grid of Tab Group / Work Session Cards -->
+      <div id="tabGroupsGrid" class="groups-grid"></div>
+    </section>
+
+    <!-- Right Column: ADK Agent Assistant & Live AgentOps Telemetry -->
+    <aside class="assistant-column" aria-label="TabFlow ADK Agent Assistant">
+      <div class="assistant-card">
+        <div class="assistant-header">
+          <div>
+            <h2>TabFlow Concierge</h2>
+            <p class="assistant-caption">Coordinator → <code>Flash</code> (Triage) &amp; <code>Pro</code> (Synthesis)</p>
+          </div>
+          <span class="model-chip" id="activeModelChip">Ready</span>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="quick-chips">
+          <button class="chip" data-prompt="Organize and propose merge plans for my overlapping saved tab groups">
+            ✨ Propose session merges
+          </button>
+          <button class="chip" data-prompt="Show my Cloud Run work sessions">
+            🔎 Cloud Run sessions
+          </button>
+          <button class="chip" data-prompt="Rename 'Mon ADK work' to 'ADK Assessment Prep'">
+            ✏️ Rename ADK session
+          </button>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chatMessages" class="chat-messages">
+          <div class="msg msg-assistant">
+            <div class="msg-meta">TabFlow Coordinator</div>
+            <div class="msg-bubble">
+              Welcome! Each card on the left is a saved <strong>Tab Group (Work Session)</strong>.
+              <br /><br />
+              Click <strong>✨ Auto-Analyze &amp; Propose Merges</strong> (or ask me below) and I will:
+              <ol>
+                <li>Deduplicate URLs &amp; scrub sensitive tokens/emails,</li>
+                <li>Route stray tabs to matching existing groups (like <em>Japan Trip</em>) or a <em>Misc</em> group,</li>
+                <li>Suggest a unified Work Session name &amp; <em>"Where I left off"</em> note for your approval!</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form id="chatForm" class="chat-form">
+          <input
+            type="text"
+            id="chatInput"
+            placeholder="Ask TabFlow to merge, rename, or find a work session..."
+            required
+          />
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+      </div>
+
+      <!-- Live AgentOps Observability & Tracing Drawer -->
+      <div class="telemetry-card">
+        <div class="telemetry-header">
+          <h3>AgentOps Observability &amp; Traces</h3>
+          <span class="otel-badge">OpenTelemetry + JSON Logs</span>
+        </div>
+        <div class="telemetry-tabs">
+          <button class="tel-tab active" data-tab="logs">Intent vs. Outcome Logs</button>
+          <button class="tel-tab" data-tab="spans">Trace Spans</button>
+          <button class="tel-tab" data-tab="memory">Async Memory</button>
+        </div>
+        <div id="telemetryContent" class="telemetry-content"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Inline Rename & Note Edit Modal -->
+  <div id="editModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Edit Work Session Name &amp; Note</h3>
+      <input type="hidden" id="editGroupId" />
+      <label class="field-label" for="editSessionName">Work Session / Tab Group Name</label>
+      <input type="text" id="editSessionName" class="field-input" required />
+      <label class="field-label" for="editSessionNote">"Where I Left Off" Summary Note</label>
+      <textarea id="editSessionNote" class="field-textarea" rows="3"></textarea>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btnCancelEdit">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btnSaveEdit">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Human-in-the-Loop Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <span class="hitl-badge">HITL CONFIRMATION GATE</span>
+      <h3>Delete Saved Tab Group?</h3>
+      <p id="deleteModalText" class="modal-desc"></p>
+      <input type="hidden" id="deleteGroupId" />
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btnCancelDelete">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmDelete">Confirm Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Chrome Extension Bridge Setup Modal -->
+  <div id="extensionModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" role="dialog" aria-modal="true" style="max-width: 520px;">
+      <span class="badge-adk" style="align-self: flex-start;">LIVE CHROME BRIDGE</span>
+      <h3>Connect Your Actual Chrome Tab Groups (10-Second Setup)</h3>
+      <p class="modal-desc">
+        Because of Chrome's browser security sandbox, a localhost web page cannot read your real tabs directly without a browser extension. We included a lightweight bridge extension in this project!
+      </p>
+      <ol style="font-size: 0.83rem; color: #334155; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.45rem;">
+        <li>Open <code>chrome://extensions</code> in a new Chrome tab.</li>
+        <li>Toggle on <strong>Developer mode</strong> (top-right corner).</li>
+        <li>Click <strong>Load unpacked</strong> (top-left) and select the <code>chrome_extension</code> folder inside this repository:<br/>
+          <code style="display:block; margin-top:4px; padding:6px 8px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; user-select:all; word-break:break-all;">./chrome_extension</code>
+        </li>
+        <li>Refresh this page and click <strong>🔄 Sync My Chrome Tabs</strong>!</li>
+      </ol>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" id="btnCloseExtensionModal">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Closed Saved Tab Groups (LevelDB) Import Modal -->
+  <div id="closedGroupsModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" role="dialog" aria-modal="true" style="max-width: 530px;">
+      <span class="hitl-badge" style="align-self: flex-start;">CLOSED SAVED TAB GROUPS</span>
+      <h3>Import Closed Tab Groups from Chrome Profile</h3>
+      <p class="modal-desc">
+        Chrome's extension API (<code>chrome.tabGroups</code>) only exposes <strong>currently open</strong> tab groups. Closed "Saved Tab Groups" are stored by Chrome in your profile's <code>Sync Data/LevelDB</code> folder.
+      </p>
+      <ol style="font-size: 0.83rem; color: #334155; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.45rem;">
+        <li>
+          <strong>Option A (Automatic):</strong> Run <code>python3 app.py</code> directly in your own terminal—clicking <strong>🔄 Sync My Chrome Tabs</strong> will automatically read <code>~/.config/google-chrome/*/Sync Data/LevelDB</code>!
+        </li>
+        <li>
+          <strong>Option B (Select Folder Here):</strong> Click <strong>Select LevelDB Folder</strong> below and choose:<br/>
+          <code style="display:block; margin-top:4px; padding:6px 8px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; user-select:all; word-break:break-all;">~/.config/google-chrome/Default/Sync Data/LevelDB</code>
+        </li>
+      </ol>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btnCancelClosedModal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btnChooseLeveldbFolder">📂 Select LevelDB Folder</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "TabFlow — Live Chrome Tab Group & Window Bridge",
+  "version": "1.1.0",
+  "description": "Bridges your real Chrome Tab Groups (open & closed), Named Windows, and Ungrouped Tabs with the TabFlow ADK Work Session Manager UI.",
+  "permissions": [
+    "tabs",
+    "tabGroups",
+    "windows",
+    "sessions",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:8080/*",
+    "http://127.0.0.1:8080/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "TabFlow Work Session Sync",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://localhost:8080/*",
+        "http://127.0.0.1:8080/*"
+      ],
+      "js": ["content_bridge.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+google-adk>=1.0.0
+google-genai>=1.0.0
+google-cloud-secret-manager>=2.20.0
+google-cloud-dlp>=3.18.0
+pydantic>=2.7.0
+opentelemetry-api>=1.25.0
+opentelemetry-sdk>=1.25.0
+python-json-logger>=2.0.7
+pytest>=8.2.0
+

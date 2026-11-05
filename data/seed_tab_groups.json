@@ -1,0 +1,128 @@
+[
+  {
+    "group_id": "grp-adk-mon",
+    "session_name": "Mon ADK work",
+    "color": "blue",
+    "where_i_left_off_note": "Started reading ADK multi-agent docs on Monday morning.",
+    "updated_at": "2026-11-05T09:15:00Z",
+    "tabs": [
+      {
+        "tab_id": "tab-101",
+        "title": "Agent Development Kit (ADK) Documentation - Multi-Agent Systems",
+        "url": "https://google.github.io/adk-docs/agents/multi-agents/?utm_source=course&token=secret_tok_99182"
+      },
+      {
+        "tab_id": "tab-102",
+        "title": "google/adk-python: Agent Development Kit for Python - GitHub",
+        "url": "https://github.com/google/adk-python"
+      },
+      {
+        "tab_id": "tab-103",
+        "title": "Vertex AI Agent Engine Overview | Google Cloud",
+        "url": "https://docs.cloud.google.com/agent-builder/agent-engine/overview?user_email=developer@example.com"
+      },
+      {
+        "tab_id": "tab-104",
+        "title": "Kyoto Traditional Ryokan Inns - Booking.com",
+        "url": "https://www.booking.com/city/jp/kyoto.html"
+      },
+      {
+        "tab_id": "tab-105",
+        "title": "Wordle - The New York Times Daily Puzzle",
+        "url": "https://www.nytimes.com/games/wordle/index.html"
+      }
+    ]
+  },
+  {
+    "group_id": "grp-unnamed-2",
+    "session_name": "Unnamed Group 2",
+    "color": "indigo",
+    "where_i_left_off_note": "",
+    "updated_at": "2026-11-05T11:40:00Z",
+    "tabs": [
+      {
+        "tab_id": "tab-201",
+        "title": "Agent Development Kit (ADK) Documentation - Multi-Agent Systems",
+        "url": "https://google.github.io/adk-docs/agents/multi-agents/"
+      },
+      {
+        "tab_id": "tab-202",
+        "title": "ADK Evaluation & Golden Datasets Guide",
+        "url": "https://google.github.io/adk-docs/evaluate/"
+      },
+      {
+        "tab_id": "tab-203",
+        "title": "ADK Callbacks & Guardrails Reference",
+        "url": "https://google.github.io/adk-docs/callbacks/"
+      }
+    ]
+  },
+  {
+    "group_id": "grp-cloudrun-1",
+    "session_name": "Cloud Run 403",
+    "color": "rose",
+    "where_i_left_off_note": "Investigating 403 IAM permission error on service account during deploy.",
+    "updated_at": "2026-11-05T13:20:00Z",
+    "tabs": [
+      {
+        "tab_id": "tab-301",
+        "title": "Cloud Run IAM Roles & Permissions | Google Cloud Docs",
+        "url": "https://cloud.google.com/run/docs/securing/managing-access"
+      },
+      {
+        "tab_id": "tab-302",
+        "title": "Terraform google_cloud_run_v2_service Resource Reference",
+        "url": "https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_v2_service"
+      },
+      {
+        "tab_id": "tab-303",
+        "title": "Shinkansen Bullet Train Tokyo to Kyoto Timetable - JR Pass",
+        "url": "https://www.japan-guide.com/e/e2018_tokaido.html"
+      }
+    ]
+  },
+  {
+    "group_id": "grp-cloudrun-2",
+    "session_name": "Tues deploy fix",
+    "color": "amber",
+    "where_i_left_off_note": "",
+    "updated_at": "2026-11-05T14:50:00Z",
+    "tabs": [
+      {
+        "tab_id": "tab-401",
+        "title": "Cloud Run IAM Roles & Permissions | Google Cloud Docs",
+        "url": "https://cloud.google.com/run/docs/securing/managing-access?session_id=abc987654"
+      },
+      {
+        "tab_id": "tab-402",
+        "title": "Configuring Secret Manager Secrets in Cloud Run",
+        "url": "https://cloud.google.com/run/docs/configuring/secrets"
+      },
+      {
+        "tab_id": "tab-403",
+        "title": "Best Espresso Grinder Settings Guide - Home Barista",
+        "url": "https://www.home-barista.com/grinders/espresso-dialing-in.html"
+      }
+    ]
+  },
+  {
+    "group_id": "grp-japan",
+    "session_name": "Japan Trip",
+    "color": "emerald",
+    "where_i_left_off_note": "Comparing Tokyo & Kyoto neighborhoods and rail passes for November.",
+    "updated_at": "2026-11-05T15:10:00Z",
+    "tabs": [
+      {
+        "tab_id": "tab-501",
+        "title": "Tokyo Neighborhood Guide: Shibuya vs Shinjuku - Japan Guide",
+        "url": "https://www.japan-guide.com/e/e2164.html"
+      },
+      {
+        "tab_id": "tab-502",
+        "title": "Kyoto Autumn Foliage Forecast & Temple Map",
+        "url": "https://www.japan-guide.com/e/e2014.html"
+      }
+    ]
+  }
+]
+
